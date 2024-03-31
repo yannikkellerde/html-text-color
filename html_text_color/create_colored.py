@@ -1,7 +1,7 @@
 from xml.etree import ElementTree as ET
 import numpy as np
 
-replacements = {"▁": " ", "<0x0A>": "\n", "Ġ": " "}
+replacements = {"▁": " ", "<0x0A>": "<br>", "Ġ": " ", "\n": "<br>"}
 
 
 def process_color_nums(color_nums, normalize=True, color_order="rgb"):
@@ -27,9 +27,10 @@ def process_color_nums(color_nums, normalize=True, color_order="rgb"):
 def from_text(tokens, color_nums, normalize=True, color_order="rgb", beautify=True):
     tokens = tokens.copy()
     if type(tokens[0]) == list:
-        color_nums = np.array(
-            [process_color_nums(cn, normalize, color_order) for cn in color_nums]
-        )
+        color_nums = [
+            process_color_nums(cn, normalize, color_order) for cn in color_nums
+        ]
+
     else:
         color_nums = process_color_nums(color_nums, normalize, color_order)
         color_nums = color_nums[None, ...]
