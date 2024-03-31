@@ -65,7 +65,10 @@ def from_ids(
     normalize=True,
     color_order="rgb",
     beautify=True,
-    embed=False,
 ):
-    tokens = tokenizer.convert_ids_to_tokens(ids)
+    ids = np.array(ids)
+    if ids.ndim == 1:
+        tokens = tokenizer.convert_ids_to_tokens(ids)
+    else:
+        tokens = [tokenizer.convert_ids_to_tokens(i) for i in ids]
     return from_text(tokens, color_nums, normalize, color_order, beautify)
