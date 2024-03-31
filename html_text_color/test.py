@@ -1,4 +1,4 @@
-from create_colored import from_tokens, from_ids
+from html_text_color.create_colored import from_tokens, from_ids
 from transformers import AutoTokenizer
 
 
