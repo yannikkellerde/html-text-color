@@ -1,3 +1,3 @@
-from .create_colored import from_tokens, from_ids
+from .create_colored import from_text, from_ids
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"

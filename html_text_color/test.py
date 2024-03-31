@@ -1,4 +1,4 @@
-from html_text_color.create_colored import from_tokens, from_ids
+from html_text_color.create_colored import from_text, from_ids
 from transformers import AutoTokenizer
 
 
@@ -6,7 +6,7 @@ def test_single():
     tokens = ["I", "▁am", "▁a", "▁sentence", "."]
     numbers = [1, 2, 3, 4, 5]
 
-    html = from_tokens(tokens, numbers, dim_order="b")
+    html = from_text(tokens, numbers, color_order="b")
     with open("test_outputs/test_single.html", "w") as f:
         f.write(html)
 
@@ -21,7 +21,7 @@ def test_multiple():
         [[5, 0, 0], [4, 2, 0], [3, 4, 0], [2, 6, 0], [1, 8, 0]],
     ]
 
-    html = from_tokens(tokens, numbers)
+    html = from_text(tokens, numbers)
     with open("test_outputs/test_multiple.html", "w") as f:
         f.write(html)
 

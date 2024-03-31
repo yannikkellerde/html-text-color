@@ -4,7 +4,7 @@ import numpy as np
 replacements = {"▁": " ", "<0x0A>": "\n", "Ġ": " "}
 
 
-def process_color_nums(color_nums, normalize=True, dim_order="rgb"):
+def process_color_nums(color_nums, normalize=True, color_order="rgb"):
     color_nums = np.array(color_nums)
     if color_nums.ndim == 1:
         color_nums = color_nums[:, None]
@@ -19,19 +19,19 @@ def process_color_nums(color_nums, normalize=True, dim_order="rgb"):
 
     tmp = np.zeros((color_nums.shape[0], 3), dtype=int)
     for i, d in enumerate("rgb"):
-        if d in dim_order and color_nums.shape[1] > dim_order.index(d):
-            tmp[:, i] = color_nums[:, dim_order.index(d)]
+        if d in color_order and color_nums.shape[1] > color_order.index(d):
+            tmp[:, i] = color_nums[:, color_order.index(d)]
     return tmp
 
 
-def from_tokens(tokens, color_nums, normalize=True, dim_order="rgb", beautify=True):
+def from_text(tokens, color_nums, normalize=True, color_order="rgb", beautify=True):
     tokens = tokens.copy()
     if type(tokens[0]) == list:
         color_nums = np.array(
-            [process_color_nums(cn, normalize, dim_order) for cn in color_nums]
+            [process_color_nums(cn, normalize, color_order) for cn in color_nums]
         )
     else:
-        color_nums = process_color_nums(color_nums, normalize, dim_order)
+        color_nums = process_color_nums(color_nums, normalize, color_order)
         color_nums = color_nums[None, ...]
         tokens = [tokens]
 
@@ -63,9 +63,9 @@ def from_ids(
     tokenizer,
     color_nums,
     normalize=True,
-    dim_order="rgb",
+    color_order="rgb",
     beautify=True,
     embed=False,
 ):
     tokens = tokenizer.convert_ids_to_tokens(ids)
-    return from_tokens(tokens, color_nums, normalize, dim_order, beautify)
+    return from_text(tokens, color_nums, normalize, color_order, beautify)

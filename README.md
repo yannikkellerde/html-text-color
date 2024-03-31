@@ -5,8 +5,8 @@
 ## Usage
 Input:
 ```python
-from html_text_color import from_tokens
-html = from_tokens(["I", " am", " a", " sentence", "."], [1, 2, 3, 4, 5], dim_order="b")
+from html_text_color import from_text
+html = from_text(["I", " am", " a", " sentence", "."], [1, 2, 3, 4, 5], color_order="b")
 ```
 Output html:  
 ![test_outputs/test_single.html](test_outputs/test_single.svg)
@@ -14,12 +14,12 @@ Output html:
 
 Input:
 ```python
-html = from_tokens(
+html = from_text(
     [["I", "▁am", "▁a", "▁sentence", "."],
     ["I", "▁am", "▁another", "▁sentence", "."]],
     [[[1, 0, 5], [2, 0, 2], [3, 0, 3], [4, 0, 4], [5, 0, 5]],
     [[5, 0, 0], [4, 2, 0], [3, 4, 0], [2, 6, 0], [1, 8, 0]]],
-    dim_order="rgb"
+    color_order="rgb"
 )
 ```
 Output html:  
