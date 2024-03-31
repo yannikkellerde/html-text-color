@@ -1,4 +1,6 @@
 # Visualize number vector on text using colored html
+## Installation
+`pip install html-text-color`
 
 ## Usage
 Input:
