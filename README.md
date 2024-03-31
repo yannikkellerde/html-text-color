@@ -6,7 +6,7 @@ Input:
 from html_text_color import from_tokens
 html = from_tokens(["I", " am", " a", " sentence", "."], [1, 2, 3, 4, 5], dim_order="b")
 ```
-Output html:
+Output html:  
 ![test_outputs/test_single.html](test_outputs/test_single.svg)
 <br/>
 
@@ -20,7 +20,7 @@ html = from_tokens(
     dim_order="rgb"
 )
 ```
-Output html:
+Output html:  
 ![test_outputs/test_multiple.html](test_outputs/test_multiple.svg)
 <br/>
 
@@ -31,5 +31,5 @@ from transformers import AutoTokenizer
 tokenizer = AutoTokenizer.from_pretrained("gpt2")
 html = from_ids(tokenizer.encode("I am a sentence."), tokenizer, [1, 2, 3, 4, 5])
 ```
-Output html:
+Output html:  
 ![test_outputs/test_tokens.html](test_outputs/test_tokens.svg)
