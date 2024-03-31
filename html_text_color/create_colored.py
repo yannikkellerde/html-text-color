@@ -1,7 +1,8 @@
 from xml.etree import ElementTree as ET
+from xml.etree.ElementTree import ParseError
 import numpy as np
 
-replacements = {"▁": " ", "<0x0A>": "<br>", "Ġ": " ", "\n": "<br>"}
+replacements = {"▁": " ", "<0x0A>": "<br/>", "Ġ": " ", "\n": "<br>"}
 
 
 def process_color_nums(color_nums, normalize=True, color_order="rgb"):
@@ -49,8 +50,11 @@ def from_text(tokens, color_nums, normalize=True, color_order="rgb", beautify=Tr
         p = ET.Element("p")
         body.append(p)
         for tok, col in zip(tok_paragraph, col_paragraph):
-            span = ET.Element("span")
-            span.text = tok
+            try:
+                span = ET.fromstring(f"<span>{tok}</span>")
+            except ParseError:
+                span = ET.Element("span")
+                span.text = tok
             span.attrib["style"] = (
                 f"color: rgb({col[0]}, {col[1] if len(col)>1 else 0}, {col[2] if len(col)>2 else 0})"
             )
