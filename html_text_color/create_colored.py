@@ -49,6 +49,8 @@ def from_text(tokens, color_nums, normalize=True, color_order="rgb", beautify=Tr
     for tok_paragraph, col_paragraph in zip(tokens, color_nums):
         p = ET.Element("p")
         body.append(p)
+        hr = ET.Element("hr")
+        body.append(hr)
         for tok, col in zip(tok_paragraph, col_paragraph):
             try:
                 span = ET.fromstring(f"<span>{tok}</span>")
