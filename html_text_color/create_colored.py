@@ -1,15 +1,23 @@
 from xml.etree import ElementTree as ET
 from xml.etree.ElementTree import ParseError
 import numpy as np
+from matplotlib import colormaps
+import re
 
 replacements = {"▁": " ", "<0x0A>": "<br/>", "Ġ": " ", "\n": "<br>"}
+stupid_color = re.compile(r"^[rgb]{,3}$")
 
 
-def process_color_nums(color_nums, normalize=True, color_order="rgb"):
+def process_color_nums(color_nums, normalize=True, color_order=None):
     color_nums = np.array(color_nums)
     if color_nums.ndim == 1:
         color_nums = color_nums[:, None]
 
+    if color_order is None:
+        if color_nums.shape[1] == 1:
+            color_order = "viridis"
+        else:
+            color_order = "rgb"
     assert color_nums.shape[1] <= 3, "color_nums must have 1-3 columns"
 
     if normalize:
@@ -18,14 +26,20 @@ def process_color_nums(color_nums, normalize=True, color_order="rgb"):
 
     color_nums = color_nums.astype(int)
 
-    tmp = np.zeros((color_nums.shape[0], 3), dtype=int)
-    for i, d in enumerate("rgb"):
-        if d in color_order and color_nums.shape[1] > color_order.index(d):
-            tmp[:, i] = color_nums[:, color_order.index(d)]
-    return tmp
+    out = np.zeros((color_nums.shape[0], 3), dtype=int)
+    if stupid_color.match(color_order):
+        for i, d in enumerate("rgb"):
+            if d in color_order and color_nums.shape[1] > color_order.index(d):
+                out[:, i] = color_nums[:, color_order.index(d)]
+    else:
+        assert color_nums.shape[1] == 1, f"Invalid color_order {color_order}"
+        cmap = colormaps.get_cmap(color_order)
+        for i, n in enumerate(color_nums[:, 0]):
+            out[i] = np.array(cmap(n)[:3]) * 255
+    return out
 
 
-def from_text(tokens, color_nums, normalize=True, color_order="rgb", beautify=True):
+def from_text(tokens, color_nums, normalize=True, color_order=None, beautify=True):
     tokens = tokens.copy()
     if type(tokens[0]) == list:
         color_nums = [
