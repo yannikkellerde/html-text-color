@@ -3,6 +3,7 @@ from xml.etree.ElementTree import ParseError
 import numpy as np
 from matplotlib import colormaps
 import re
+from html_text_color.util import convert_to_ranks
 
 replacements = {"▁": " ", "<0x0A>": "<br/>", "Ġ": " ", "\n": "<br>"}
 stupid_color = re.compile(r"^[rgb]{,3}$")
@@ -42,8 +43,12 @@ def process_color_nums(color_nums, normalize=True, color_order=None, mn=None, mx
     return out
 
 
-def from_text(tokens, color_nums, normalize=True, color_order=None, beautify=True):
+def from_text(
+    tokens, color_nums, normalize=True, color_order=None, beautify=True, ranked=False
+):
     tokens = tokens.copy()
+    if ranked:
+        color_nums = convert_to_ranks(color_nums)
     if type(tokens[0]) == list:
         mn = min(min(x) for x in color_nums)
         mx = max(max(x) for x in color_nums)
@@ -96,9 +101,10 @@ def from_ids(
     normalize=True,
     color_order=None,
     beautify=True,
+    ranked=False,
 ):
     if isinstance(ids[0], list):
         tokens = [tokenizer.convert_ids_to_tokens(i) for i in ids]
     else:
         tokens = tokenizer.convert_ids_to_tokens(ids)
-    return from_text(tokens, color_nums, normalize, color_order, beautify)
+    return from_text(tokens, color_nums, normalize, color_order, beautify, ranked)

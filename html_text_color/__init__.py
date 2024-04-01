@@ -1,3 +1,3 @@
 from .create_colored import from_text, from_ids
 
-__version__ = "0.0.8"
+__version__ = "0.0.9"
