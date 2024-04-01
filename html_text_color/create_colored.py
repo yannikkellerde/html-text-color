@@ -8,7 +8,7 @@ replacements = {"▁": " ", "<0x0A>": "<br/>", "Ġ": " ", "\n": "<br>"}
 stupid_color = re.compile(r"^[rgb]{,3}$")
 
 
-def process_color_nums(color_nums, normalize=True, color_order=None):
+def process_color_nums(color_nums, normalize=True, color_order=None, mn=None, mx=None):
     color_nums = np.array(color_nums)
     if color_nums.ndim == 1:
         color_nums = color_nums[:, None]
@@ -21,8 +21,11 @@ def process_color_nums(color_nums, normalize=True, color_order=None):
     assert color_nums.shape[1] <= 3, "color_nums must have 1-3 columns"
 
     if normalize:
-        color_nums = color_nums - color_nums.min(axis=0)
-        color_nums = (color_nums / np.clip(color_nums.max(axis=0), 1e-6, None)) * 255
+        color_nums = color_nums - (color_nums.min(axis=0) if mn is None else mn)
+        color_nums = (
+            color_nums
+            / np.clip(color_nums.max(axis=0) if mx is None else mx, 1e-6, None)
+        ) * 255
 
     color_nums = color_nums.astype(int)
 
@@ -42,12 +45,19 @@ def process_color_nums(color_nums, normalize=True, color_order=None):
 def from_text(tokens, color_nums, normalize=True, color_order=None, beautify=True):
     tokens = tokens.copy()
     if type(tokens[0]) == list:
+        mn = min(min(x) for x in color_nums)
+        mx = max(max(x) for x in color_nums)
         color_nums = [
-            process_color_nums(cn, normalize, color_order) for cn in color_nums
+            process_color_nums(cn, normalize, color_order, mn=mn, mx=mx)
+            for cn in color_nums
         ]
 
     else:
-        color_nums = process_color_nums(color_nums, normalize, color_order)
+        mn = min(color_nums)
+        mx = max(color_nums)
+        color_nums = process_color_nums(
+            color_nums, normalize, color_order, mn=mn, mx=mx
+        )
         color_nums = color_nums[None, ...]
         tokens = [tokens]
 
@@ -84,7 +94,7 @@ def from_ids(
     tokenizer,
     color_nums,
     normalize=True,
-    color_order="rgb",
+    color_order=None,
     beautify=True,
 ):
     if isinstance(ids[0], list):
