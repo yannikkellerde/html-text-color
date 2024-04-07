@@ -25,7 +25,7 @@ def process_color_nums(color_nums, normalize=True, color_order=None, mn=None, mx
         color_nums = color_nums - (color_nums.min(axis=0) if mn is None else mn)
         color_nums = (
             color_nums
-            / np.clip(color_nums.max(axis=0) if mx is None else mx, 1e-6, None)
+            / np.clip(color_nums.max(axis=0) if mx is None else mx - mn, 1e-6, None)
         ) * 255
 
     color_nums = color_nums.astype(int)
