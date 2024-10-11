@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def convert_to_ranks(lili: list[list[int]]) -> list[list[int]]:
     """
     Converts a list of lists of integers to a list of lists of ranks.
