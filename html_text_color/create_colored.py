@@ -4,11 +4,11 @@ from xml.etree.ElementTree import ParseError
 
 import numpy as np
 from matplotlib import colormaps
-from ykutil import IGNORE_INDEX, describe_array, log
+from ykutil import IGNORE_INDEX, describe_array, list_squeeze, log
 
 from html_text_color.util import convert_to_ranks
 
-replacements = {"▁": " ", "<0x0A>": "<br/>", "Ġ": " ", "\n": "<br>"}
+replacements = {"▁": " ", "<0x0A>": "<br/>", "Ġ": " ", "\n": "<br/>"}
 stupid_color = re.compile(r"^[rgb]{,3}$")
 
 
@@ -54,20 +54,23 @@ def process_color_nums(
 
 
 def from_text(
-    tokens,
-    color_nums,
+    tokens: list[list[str]] | list[str],
+    color_nums: list[list[int]],
     normalize=True,
     color_order=None,
     beautify=True,
     ranked=False,
     darkmode=False,
-):
+    minimum=None,
+    maximum=None,
+) -> str:
     tokens = tokens.copy()
+    print("pre", [x[:5] for x in color_nums])
     if ranked:
         color_nums = convert_to_ranks(color_nums)
     if type(tokens[0]) == list:
-        mn = min(min(x) for x in color_nums)
-        mx = max(max(x) for x in color_nums)
+        mn = min(min(x) for x in color_nums) if minimum is None else minimum
+        mx = max(max(x) for x in color_nums) if maximum is None else maximum
         color_nums = [
             process_color_nums(
                 cn, normalize, color_order, mn=mn, mx=mx, darkmode=darkmode
@@ -76,13 +79,15 @@ def from_text(
         ]
 
     else:
-        mn = min(color_nums)
-        mx = max(color_nums)
+        mn = min(color_nums) if minimum is None else minimum
+        mx = max(color_nums) if maximum is None else maximum
         color_nums = process_color_nums(
             color_nums, normalize, color_order, mn=mn, mx=mx, darkmode=darkmode
         )
         color_nums = color_nums[None, ...]
         tokens = [tokens]
+
+    print("post", [x[:5] for x in color_nums])
 
     if beautify:
         for i, ts in enumerate(tokens):
@@ -101,10 +106,12 @@ def from_text(
         hr = ET.Element("hr")
         body.append(hr)
         for tok, col in zip(tok_paragraph, col_paragraph):
-            try:
-                span = ET.fromstring(f"<span>{tok}</span>")
-            except ParseError:
-                span = ET.Element("span")
+            span = ET.Element("span")
+            if tok.startswith("<br/>"):
+                br = ET.Element("br")
+                p.append(br)
+                span.text = tok[5:]
+            else:
                 span.text = tok
             span.attrib["style"] = (
                 f"color: rgb({col[0]}, {col[1] if len(col)>1 else 0}, {col[2] if len(col)>2 else 0})"
@@ -123,11 +130,21 @@ def from_ids(
     beautify=True,
     ranked=False,
     darkmode=False,
+    minimum=None,
+    maximum=None,
 ):
     if isinstance(ids[0], list):
         tokens = [tokenizer.convert_ids_to_tokens(i) for i in ids]
     else:
         tokens = tokenizer.convert_ids_to_tokens(ids)
     return from_text(
-        tokens, color_nums, normalize, color_order, beautify, ranked, darkmode
+        tokens,
+        color_nums,
+        normalize,
+        color_order,
+        beautify,
+        ranked,
+        darkmode,
+        minimum=minimum,
+        maximum=maximum,
     )
